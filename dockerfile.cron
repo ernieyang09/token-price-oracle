@@ -1,0 +1,27 @@
+FROM golang:1.22.5 AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN go mod download
+
+RUN cd cron/price_fetcher && go build -o price_fetcher
+RUN cd cron/price_syncer && go build -o price_syncer
+
+FROM debian:bookworm-slim
+
+RUN apt-get update && \
+    apt-get install -y libc6 ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /app/cron/price_fetcher/price_fetcher .
+COPY --from=builder /app/cron/price_fetcher/conf.ini ./price_fetcher_conf.ini
+COPY --from=builder /app/cron/price_syncer/price_syncer .
+COPY --from=builder /app/cron/price_syncer/conf_docker.ini ./price_syncer_conf.ini
+
+
+
+CMD ["/sh"]

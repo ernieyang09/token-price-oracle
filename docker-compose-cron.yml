@@ -1,0 +1,36 @@
+version: "2.8"
+
+services:
+  cron-price-fetch:
+    image: cron
+    command: ["./price_fetcher"]
+    build:
+      context: .
+      dockerfile: dockerfile.cron
+    volumes:
+      - ./logs:/var/log
+    environment:
+      - CONFIG_NAME=price_fetcher_conf.ini
+      - LOG_PATH=/var/log/price_fetcher.log
+    restart: always
+
+  cron-price-sync:
+    image: cron
+    command: ["sh", "-c", "sleep 5 && ./price_syncer"]
+    build:
+      context: .
+      dockerfile: dockerfile.cron
+    volumes:
+      - ./logs:/var/log
+    environment:
+      - CONFIG_NAME=price_syncer_conf.ini
+      - LOG_PATH=/var/log/price_syncer.log
+    depends_on:
+      - cron-price-fetch
+    restart: always
+    networks:
+      - mysqlnetwork
+
+networks:
+  mysqlnetwork:
+    external: true
