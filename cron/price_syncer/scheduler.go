@@ -10,14 +10,10 @@ import (
 )
 
 func SetupJobs(c *cron.Cron) {
-    // Build the path to config.ini
-    configName := env.GetConfigValue("CONFIG_NAME", "conf.ini")
+	// Build the path to config.ini
+	configName := env.GetConfigValue("CONFIG_NAME", "conf.ini")
 
 	cfgs, err := ini.Load(configName)
-
-	if err != nil {
-		panic(err)
-	}
 
 	if err != nil {
 		panic(err)
@@ -26,9 +22,9 @@ func SetupJobs(c *cron.Cron) {
 	mysqlSection := cfgs.Section("mysql")
 
 	mysql, err := db.InitDB(&db.Mysql{
-		Host: mysqlSection.Key("host").String(),
-		User: mysqlSection.Key("user").String(),
-		Port: mysqlSection.Key("port").MustInt(),
+		Host:     mysqlSection.Key("host").String(),
+		User:     mysqlSection.Key("user").String(),
+		Port:     mysqlSection.Key("port").MustInt(),
 		Password: mysqlSection.Key("password").String(),
 		Database: mysqlSection.Key("database").String(),
 	})

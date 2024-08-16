@@ -20,10 +20,6 @@ func SetupJobs(c *cron.Cron) {
 		panic(err)
 	}
 
-	if err != nil {
-		panic(err)
-	}
-
 	// for each strategy in folder, create a job
 	jobs := []strategy.GetPriceStrategy{
 		&strategy.CoinGecko{Cfg: cfgs.Section("coingecko")},
@@ -40,6 +36,6 @@ func SetupJobs(c *cron.Cron) {
 			j.GetPrice()
 		}(job)
 
-		wg.Wait()
 	}
+	wg.Wait()
 }
